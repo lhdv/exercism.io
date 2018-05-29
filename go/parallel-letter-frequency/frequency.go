@@ -1,9 +1,5 @@
 package letter
 
-import (
-	"sync"
-)
-
 // FreqMap letters counting map
 type FreqMap map[rune]int
 
@@ -19,37 +15,21 @@ func Frequency(s string) FreqMap {
 
 // ConcurrentFrequency counts letters in string concurrently
 func ConcurrentFrequency(input []string) FreqMap {
-	var wg sync.WaitGroup
-	var cm sync.Map
+	c := make(chan FreqMap, len(input))
 	m := FreqMap{}
 
 	for _, s := range input {
 
-		wg.Add(1)
-
 		go func(s string) {
-			defer wg.Done()
-
-			r := Frequency(s)
-
-			for k, v := range r {
-				vv, exist := cm.LoadOrStore(k, v)
-				if exist {
-					new := vv.(int) + v
-					cm.Store(k, new)
-				}
-			}
+			c <- Frequency(s)
 		}(s)
-
-		wg.Wait()
 	}
 
-	// wg.Wait()
-
-	cm.Range(func(k, v interface{}) bool {
-		m[k.(rune)] = v.(int)
-		return true
-	})
+	for i := 0; i < len(input); i++ {
+		for k, v := range <-c {
+			m[k] += v
+		}
+	}
 
 	return m
 }
