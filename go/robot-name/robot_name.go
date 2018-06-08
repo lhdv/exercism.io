@@ -1,8 +1,8 @@
 package robotname
 
 import (
+	"fmt"
 	"math/rand"
-	"strconv"
 )
 
 // Robot type
@@ -10,19 +10,17 @@ type Robot struct {
 	name string
 }
 
+var robotNamePool = make(map[string]bool)
+
 // Name show robot's name
 func (r *Robot) Name() string {
 
 	if len(r.name) <= 0 {
-
-		l1 := rand.Intn(25) + 65
-		l2 := rand.Intn(25) + 65
-		d1 := rand.Intn(9)
-		d2 := rand.Intn(9)
-		d3 := rand.Intn(9)
-		s := string(l1) + string(l2) + strconv.Itoa(d1) + strconv.Itoa(d2) + strconv.Itoa(d3)
-
-		r.name = s
+		r.name = generateName()
+		for robotNamePool[r.name] {
+			r.name = generateName()
+		}
+		robotNamePool[r.name] = true
 	}
 	return r.name
 }
@@ -30,4 +28,11 @@ func (r *Robot) Name() string {
 // Reset robot's name
 func (r *Robot) Reset() {
 	r.name = ""
+}
+
+func generateName() string {
+	l1 := rand.Intn(25) + 'A'
+	l2 := rand.Intn(25) + 'A'
+	d := rand.Intn(1000)
+	return fmt.Sprintf("%s%s%03d", string(l1), string(l2), d)
 }
