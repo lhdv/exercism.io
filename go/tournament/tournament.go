@@ -53,39 +53,39 @@ func buildTeam(input []string, t map[string]team) error {
 
 	var teamA, teamB team
 
-	if len(input) == 3 {
-		teamA = t[input[0]]
-		teamB = t[input[1]]
-		result := input[2]
-
-		teamA.Name = input[0]
-		teamA.Matches++
-		teamB.Name = input[1]
-		teamB.Matches++
-
-		switch {
-		case result == "win":
-			teamA.Points += 3
-			teamA.Wins++
-			teamB.Loses++
-		case result == "loss":
-			teamA.Loses++
-			teamB.Points += 3
-			teamB.Wins++
-		case result == "draw":
-			teamA.Draws++
-			teamA.Points++
-			teamB.Draws++
-			teamB.Points++
-		default:
-			return errors.New("Invalid Result Data")
-		}
-
-		t[input[0]] = teamA
-		t[input[1]] = teamB
-	} else {
+	if len(input) != 3 {
 		return errors.New("Invalid Input Data")
 	}
+
+	teamA = t[input[0]]
+	teamB = t[input[1]]
+	result := input[2]
+
+	teamA.Name = input[0]
+	teamA.Matches++
+	teamB.Name = input[1]
+	teamB.Matches++
+
+	switch {
+	case result == "win":
+		teamA.Points += 3
+		teamA.Wins++
+		teamB.Loses++
+	case result == "loss":
+		teamA.Loses++
+		teamB.Points += 3
+		teamB.Wins++
+	case result == "draw":
+		teamA.Draws++
+		teamA.Points++
+		teamB.Draws++
+		teamB.Points++
+	default:
+		return errors.New("Invalid Result Data")
+	}
+
+	t[input[0]] = teamA
+	t[input[1]] = teamB
 
 	return nil
 }
