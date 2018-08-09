@@ -9,8 +9,8 @@ import (
 	"strings"
 )
 
-// Team defines a team entry in score table
-type Team struct {
+// team defines a team entry in score table
+type team struct {
 	Name    string
 	Matches int
 	Wins    int
@@ -19,19 +19,14 @@ type Team struct {
 	Points  int
 }
 
-func (t Team) String() string {
+func (t team) String() string {
 	return fmt.Sprintf("%-31v| %2d | %2d | %2d | %2d | %2d", t.Name, t.Matches, t.Wins, t.Draws, t.Loses, t.Points)
-}
-
-// CalcPoints calculate how many points a team has
-func (t *Team) CalcPoints() {
-	t.Points = (t.Wins * 3) + t.Draws
 }
 
 // Tally build a score table from a soccer competition
 func Tally(r io.Reader, w io.Writer) error {
 
-	teams := make(map[string]Team, 0)
+	teams := make(map[string]team, 0)
 
 	scanner := bufio.NewScanner(r)
 	for scanner.Scan() {
@@ -54,9 +49,9 @@ func Tally(r io.Reader, w io.Writer) error {
 	return nil
 }
 
-func buildTeam(input string, t map[string]Team) error {
+func buildTeam(input string, t map[string]team) error {
 
-	var ta, tb Team
+	var ta, tb team
 
 	input = strings.TrimSpace(input)
 	input = strings.TrimSuffix(input, "\n")
@@ -99,9 +94,9 @@ func buildTeam(input string, t map[string]Team) error {
 	return nil
 }
 
-func printOutput(teams map[string]Team, w io.Writer) {
+func printOutput(teams map[string]team, w io.Writer) {
 
-	table := make([]Team, 0)
+	table := make([]team, 0)
 
 	for _, t := range teams {
 		table = append(table, t)
