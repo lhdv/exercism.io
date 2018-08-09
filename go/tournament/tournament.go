@@ -2,11 +2,11 @@ package tournament
 
 import (
 	"bufio"
+	"encoding/csv"
 	"errors"
 	"fmt"
 	"io"
 	"sort"
-	"strings"
 )
 
 // team defines a team entry in score table
@@ -28,20 +28,20 @@ func Tally(r io.Reader, w io.Writer) error {
 
 	teams := make(map[string]team, 0)
 
-	scanner := bufio.NewScanner(r)
-	for scanner.Scan() {
-		s := scanner.Text()
+	csvReader := csv.NewReader(r)
+	csvReader.Comma = ';'
+	csvReader.Comment = '#'
 
-		// Ignore empty lines and lines beginning with '#'
-		if len(s) > 0 && s[:1] != "#" {
-			err := buildTeam(s, teams)
-			if err != nil {
-				return err
-			}
-		}
-	}
-	if err := scanner.Err(); err != nil {
+	records, err := csvReader.ReadAll()
+	if err != nil {
 		return errors.New("Error reading input data")
+	}
+
+	for _, record := range records {
+		err := buildTeam(record, teams)
+		if err != nil {
+			return err
+		}
 	}
 
 	printOutput(teams, w)
@@ -49,44 +49,40 @@ func Tally(r io.Reader, w io.Writer) error {
 	return nil
 }
 
-func buildTeam(input string, t map[string]team) error {
+func buildTeam(input []string, t map[string]team) error {
 
-	var ta, tb team
+	var teamA, teamB team
 
-	input = strings.TrimSpace(input)
-	input = strings.TrimSuffix(input, "\n")
-	s := strings.Split(input, ";")
+	if len(input) == 3 {
+		teamA = t[input[0]]
+		teamB = t[input[1]]
+		result := input[2]
 
-	if len(s) == 3 {
-		ta = t[s[0]]
-		tb = t[s[1]]
-		result := s[2]
-
-		ta.Name = s[0]
-		ta.Matches++
-		tb.Name = s[1]
-		tb.Matches++
+		teamA.Name = input[0]
+		teamA.Matches++
+		teamB.Name = input[1]
+		teamB.Matches++
 
 		switch {
 		case result == "win":
-			ta.Points += 3
-			ta.Wins++
-			tb.Loses++
+			teamA.Points += 3
+			teamA.Wins++
+			teamB.Loses++
 		case result == "loss":
-			ta.Loses++
-			tb.Points += 3
-			tb.Wins++
+			teamA.Loses++
+			teamB.Points += 3
+			teamB.Wins++
 		case result == "draw":
-			ta.Draws++
-			ta.Points++
-			tb.Draws++
-			tb.Points++
+			teamA.Draws++
+			teamA.Points++
+			teamB.Draws++
+			teamB.Points++
 		default:
 			return errors.New("Invalid Result Data")
 		}
 
-		t[s[0]] = ta
-		t[s[1]] = tb
+		t[input[0]] = teamA
+		t[input[1]] = teamB
 	} else {
 		return errors.New("Invalid Input Data")
 	}
