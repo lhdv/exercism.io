@@ -98,8 +98,21 @@ func printOutput(teams map[string]team, w io.Writer) {
 		table = append(table, t)
 	}
 
-	sort.SliceStable(table, func(i, j int) bool { return table[i].Name < table[j].Name })
-	sort.SliceStable(table, func(i, j int) bool { return table[i].Points > table[j].Points })
+	sortFunc := func(i, j int) bool {
+
+		if table[i].Points > table[j].Points {
+			return true
+		}
+
+		if table[i].Points == table[j].Points && table[i].Name < table[j].Name {
+			return true
+		}
+
+		return false
+
+	}
+
+	sort.SliceStable(table, sortFunc)
 
 	write := bufio.NewWriter(w)
 	fmt.Fprintln(write, fmt.Sprintf("%-31v| %2v | %2v | %2v | %2v | %2v", "Team", "MP", "W", "D", "L", "P"))
@@ -107,5 +120,4 @@ func printOutput(teams map[string]team, w io.Writer) {
 		fmt.Fprintln(write, t)
 	}
 	write.Flush()
-
 }
