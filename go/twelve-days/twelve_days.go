@@ -1,40 +1,44 @@
 package twelve
 
 import (
+	"bytes"
 	"fmt"
+)
+
+var (
+	gifts = []string{
+		"a Partridge in a Pear Tree.",
+		"two Turtle Doves, ",
+		"three French Hens, ",
+		"four Calling Birds, ",
+		"five Gold Rings, ",
+		"six Geese-a-Laying, ",
+		"seven Swans-a-Swimming, ",
+		"eight Maids-a-Milking, ",
+		"nine Ladies Dancing, ",
+		"ten Lords-a-Leaping, ",
+		"eleven Pipers Piping, ",
+		"twelve Drummers Drumming, "}
+
+	ordinalNumber = []string{
+		"first",
+		"second",
+		"third",
+		"fourth",
+		"fifth",
+		"sixth",
+		"seventh",
+		"eighth",
+		"ninth",
+		"tenth",
+		"eleventh",
+		"twelfth"}
 )
 
 type ordinal int
 
 func (o ordinal) String() string {
-	switch {
-	case o == 1:
-		return "first"
-	case o == 2:
-		return "second"
-	case o == 3:
-		return "third"
-	case o == 4:
-		return "fourth"
-	case o == 5:
-		return "fifth"
-	case o == 6:
-		return "sixth"
-	case o == 7:
-		return "seventh"
-	case o == 8:
-		return "eighth"
-	case o == 9:
-		return "ninth"
-	case o == 10:
-		return "tenth"
-	case o == 11:
-		return "eleventh"
-	case o == 12:
-		return "twelfth"
-	default:
-		return ""
-	}
+	return ordinalNumber[o-1]
 }
 
 type lyricVerse struct {
@@ -44,45 +48,30 @@ type lyricVerse struct {
 
 func (lv lyricVerse) String() string {
 
-	gifts := make(map[int]string)
-	gifts[1] = "a Partridge in a Pear Tree"
-	gifts[2] = "two Turtle Doves"
-	gifts[3] = "three French Hens"
-	gifts[4] = "four Calling Birds"
-	gifts[5] = "five Gold Rings"
-	gifts[6] = "six Geese-a-Laying"
-	gifts[7] = "seven Swans-a-Swimming"
-	gifts[8] = "eight Maids-a-Milking"
-	gifts[9] = "nine Ladies Dancing"
-	gifts[10] = "ten Lords-a-Leaping"
-	gifts[11] = "eleven Pipers Piping"
-	gifts[12] = "twelve Drummers Drumming"
+	var b bytes.Buffer
+
+	fmt.Fprintf(&b, "On the %s day of Christmas my true love gave to me, ", ordinal(lv.day))
 
 	for i := lv.day; i >= 1; i-- {
-		if i > 1 {
-			lv.gift += gifts[i] + ", "
-		} else {
-			if lv.day > 1 {
-				lv.gift += "and " + gifts[i] + "."
-			} else {
-				lv.gift += gifts[i] + "."
-			}
+		if i <= 1 && lv.day > 1 {
+			fmt.Fprintf(&b, "%s", "and ")
 		}
+		fmt.Fprintf(&b, "%s", gifts[i-1])
 	}
 
-	return fmt.Sprintf("On the %s day of Christmas my true love gave to me, %s", ordinal(lv.day), lv.gift)
+	return b.String()
 }
 
 // Song print the twelve days song
 func Song() string {
 
-	var song string
+	var song bytes.Buffer
 
 	for i := 1; i <= 12; i++ {
-		song += Verse(i) + "\n"
+		fmt.Fprintf(&song, "%s\n", Verse(i))
 	}
 
-	return song
+	return song.String()
 }
 
 // Verse return a song's verse based on its number
