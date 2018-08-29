@@ -1,9 +1,5 @@
 package pascal
 
-import (
-	"log"
-)
-
 // Triangle build a Pascal Triangle for a given int
 func Triangle(n int) [][]int {
 
@@ -14,15 +10,24 @@ func Triangle(n int) [][]int {
 	}
 
 	result = append(result, []int{1})
+	if n == 1 {
+		return result
+	}
 
-	log.Printf("%v\n", result)
+	result = append(result, []int{1, 1})
+	if n == 2 {
+		return result
+	}
 
-	for i := 1; i < n; i++ {
-		var innerResult []int
-		for j := 1; j <= n; i++ {
-			result[i] = append(result[i], i)
+	for i := 2; i < n; i++ {
+		row := make([]int, 0)
+		row = append(row, 1)
+		for j := 1; j < i; j++ {
+			n := result[i-1][j-1] + result[i-1][j]
+			row = append(row, n)
 		}
-		result = append(result, innerResult)
+		row = append(row, 1)
+		result = append(result, row)
 	}
 
 	return result
