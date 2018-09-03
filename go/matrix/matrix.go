@@ -28,14 +28,14 @@ func New(input string) (Matrix, error) {
 		return nil, errors.New("Error reading input data")
 	}
 
-	matrix := make(Matrix, 0)
+	matrix := make(Matrix, len(records))
 
-	for _, record := range records {
+	for k, record := range records {
 		numbers, err := convertSliceStringToInt(record)
 		if err != nil {
 			return nil, err
 		}
-		matrix = append(matrix, numbers)
+		matrix[k] = numbers
 	}
 
 	return matrix, nil
@@ -46,9 +46,9 @@ func (m Matrix) Rows() [][]int {
 	var output Matrix
 
 	for _, row := range m {
-		c := make([]int, 0)
-		for _, col := range row {
-			c = append(c, col)
+		c := make([]int, len(row))
+		for k, col := range row {
+			c[k] = col
 		}
 
 		output = append(output, c)
@@ -61,9 +61,9 @@ func (m Matrix) Cols() [][]int {
 	var output Matrix
 
 	for i := 0; i < len(m[0]); i++ {
-		c := make([]int, 0)
+		c := make([]int, len(m))
 		for j := 0; j < len(m); j++ {
-			c = append(c, m[j][i])
+			c[j] = m[j][i]
 		}
 
 		output = append(output, c)
@@ -75,16 +75,14 @@ func (m Matrix) Cols() [][]int {
 // Set a given value on an specific matrix position
 func (m *Matrix) Set(a, b, c int) bool {
 
-	for kr, row := range *m {
-		for kc := range row {
-			if kr == a && kc == b {
-				(*m)[kr][kc] = c
-				return true
-			}
-		}
+	if (a >= 0 && a < len(*m)) &&
+		(b >= 0 && b < len((*m)[0])) {
+		(*m)[a][b] = c
+		return true
 	}
 
 	return false
+
 }
 
 func hasEmptyRows(input string) bool {
@@ -100,14 +98,14 @@ func hasEmptyRows(input string) bool {
 }
 
 func convertSliceStringToInt(input []string) ([]int, error) {
-	ret := make([]int, 0)
+	ret := make([]int, len(input))
 
-	for _, v := range input {
+	for k, v := range input {
 		n, error := strconv.Atoi(v)
 		if error != nil {
 			return nil, errors.New("Invalid int data)")
 		}
-		ret = append(ret, n)
+		ret[k] = n
 	}
 
 	return ret, nil
