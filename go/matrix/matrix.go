@@ -3,6 +3,7 @@ package matrix
 import (
 	"encoding/csv"
 	"errors"
+	"io"
 	"regexp"
 	"strconv"
 	"strings"
@@ -23,19 +24,24 @@ func New(input string) (Matrix, error) {
 	recReader.Comma = ' '
 	recReader.TrimLeadingSpace = true
 
-	records, err := recReader.ReadAll()
-	if err != nil {
-		return nil, errors.New("Error reading input data")
-	}
+	matrix := make(Matrix, 0)
 
-	matrix := make(Matrix, len(records))
+	for {
+		record, err := recReader.Read()
 
-	for k, record := range records {
+		if err == io.EOF {
+			break
+		}
+
+		if err != nil {
+			return nil, err
+		}
+
 		numbers, err := convertSliceStringToInt(record)
 		if err != nil {
 			return nil, err
 		}
-		matrix[k] = numbers
+		matrix = append(matrix, numbers)
 	}
 
 	return matrix, nil
@@ -75,8 +81,7 @@ func (m Matrix) Cols() [][]int {
 // Set a given value on an specific matrix position
 func (m *Matrix) Set(a, b, c int) bool {
 
-	if (a >= 0 && a < len(*m)) &&
-		(b >= 0 && b < len((*m)[0])) {
+	if (a >= 0 && a < len(*m)) && (b >= 0 && b < len((*m)[0])) {
 		(*m)[a][b] = c
 		return true
 	}
