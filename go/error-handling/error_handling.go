@@ -14,7 +14,7 @@ func Use(o ResourceOpener, input string) (err error) {
 			return Use(o, input)
 		}
 
-		return err
+		return
 	}
 
 	defer func() {
@@ -32,5 +32,5 @@ func Use(o ResourceOpener, input string) (err error) {
 
 	res.Frob(input)
 
-	return err
+	return
 }
